@@ -7,32 +7,33 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Arrays;
 
 public class Util {
-    private String LOGIN;
-    private String PASSWORD;
-    private String URL;
-    private Connection connection;
+    private static String LOGIN = "root";
+    private static String PASSWORD = "qweszxc";
+    private static String URL = "jdbc:mysql://localhost:3306/mysqldbtest?useSSL=false";
+    private static Connection connection = null;
 
-    public Util(String login, String password, String url) {
-        LOGIN = login;
-        PASSWORD = password;
-        URL = url;
-
+    private static void setConnection() {
         try {
             Driver driver = new FabricMySQLDriver();
             DriverManager.registerDriver(driver);
-
-            connection = DriverManager.getConnection(url,login,password);
-        } catch (SQLException throwables) {
-            System.out.println("ERROR CONNECT");
-            throwables.printStackTrace();
+            connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
+            connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            System.out.println("Driver connection error!");
+            e.printStackTrace();
         }
-
     }
 
-    public Connection getConnection() {
+    public static Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                setConnection();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return connection;
     }
 }

@@ -7,6 +7,8 @@ package jm.task.core.jdbc;
 
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import jm.task.core.jdbc.service.UserService;
 import jm.task.core.jdbc.service.UserServiceImpl;
 import jm.task.core.jdbc.util.Util;
 
@@ -14,19 +16,17 @@ public class Main {
 
     public static void main(String[] args) {
 
-        UserServiceImpl service = new UserServiceImpl();
-        service.createUsersTable();
+        UserService userService = new UserServiceImpl();
+        userService.createUsersTable();
 
         for(int i = 0; i < 5; ++i) {
-            service.saveUser(runString(), runString(), (byte)((int)Math.abs(Math.random() * 100.0D)));
+            userService.saveUser(runString(), runString(), (byte)((int)Math.abs(Math.random() * 100.0D)));
         }
 
-        service.getAllUsers().forEach((u) -> {
-            System.out.println(u.toString());
-        });
+        userService.getAllUsers().forEach(System.out::println);
 //        service.removeUserById(1);
-        service.cleanUsersTable();
-        service.dropUsersTable();
+        userService.cleanUsersTable();
+        userService.dropUsersTable();
     }
 
     private static String runString() {

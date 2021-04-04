@@ -7,21 +7,18 @@ package jm.task.core.jdbc.service;
 
 import java.sql.Connection;
 import java.util.List;
+
+import jm.task.core.jdbc.dao.UserDao;
+import jm.task.core.jdbc.dao.UserDaoHibernateImpl;
 import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
 public class UserServiceImpl implements UserService {
-    private static final String LOGIN = "root";
-    private static final String PASSWORD = "qweszxc";
-    private static final String URL = "jdbc:mysql://localhost:3306/mysqldbtest?useSSL=false&serverTimezone=UTC";
-    private Connection connection;
-    private UserDaoJDBCImpl daoJDBC = new UserDaoJDBCImpl();
 
-    public UserServiceImpl() {
-        Util util = new Util(LOGIN, PASSWORD, URL);
-        daoJDBC.setConnection(util.getConnection());
-    }
+    private Connection connection;
+    private UserDao daoJDBC = new UserDaoJDBCImpl();
+    //private UserDao daoJDBC = new UserDaoHibernateImpl();
 
     public void createUsersTable() {
         this.daoJDBC.createUsersTable();
