@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) {
 
         UserService userService = new UserServiceImpl();
-        userService.createUsersTable();
+       userService.createUsersTable();
 
         for (int i = 0; i < 5; ++i) {
             userService.saveUser(runString(), runString(), (byte) ((int) Math.abs(Math.random() * 100.0D)));
@@ -30,7 +30,7 @@ public class Main {
     }
 
     private static String runString() {
-        String string = (String) (new Random()).ints((long) (Math.random() * 10.0D + 8.0D) / 2L, 0, "abcdefghijklmnopqrstuvwxyz".length()).mapToObj("abcdefghijklmnopqrstuvwxyz"::charAt).map(Object::toString).collect(Collectors.joining());
+        String string = new Random().ints((long) (Math.random() * 10.0D + 8.0D) / 2L, 0, "abcdefghijklmnopqrstuvwxyz".length()).mapToObj("abcdefghijklmnopqrstuvwxyz"::charAt).map(Object::toString).collect(Collectors.joining());
         return Character.toString(string.charAt(0)).toUpperCase() + string.substring(1);
     }
 }

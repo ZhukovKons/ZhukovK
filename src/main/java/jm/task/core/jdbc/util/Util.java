@@ -3,6 +3,7 @@ package jm.task.core.jdbc.util;
 
 import com.mysql.fabric.jdbc.FabricMySQLDriver;
 import jm.task.core.jdbc.model.User;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -22,7 +23,7 @@ import java.util.Properties;
 public class Util {
     private static String LOGIN = "root";
     private static String PASSWORD = "qweszxc";
-    private static String URL = "jdbc:mysql://localhost:3306/mysqldbtest";    // если не заработало, добавить к строке: " ?useSSL=false";
+    private static String URL = "jdbc:mysql://localhost:3306/mysqldbtest?useSSL=false";
     private static Connection connection = null;
 
     public static Connection getConnection() {
@@ -48,13 +49,18 @@ public class Util {
         properties.setProperty(Environment.USER, LOGIN);
         properties.setProperty(Environment.PASS, PASSWORD);
         properties.setProperty(Environment.URL, URL);
-        properties.setProperty(Environment.SHOW_SQL, "true");
+        properties.setProperty(Environment.SHOW_SQL, "false");
 
         Configuration configuration = new Configuration().addProperties(properties);
 
         configuration.addAnnotatedClass(User.class);
         StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
-        SessionFactory sessionFactory = configuration.buildSessionFactory(serviceRegistryBuilder.build());
+        SessionFactory sessionFactory = null;
+        try {
+            sessionFactory = configuration.buildSessionFactory(serviceRegistryBuilder.build());
+        }catch (IllegalStateException | HibernateException e){
+            System.out.println("Driver connection error!");
+        }
 
         return sessionFactory;
     }
