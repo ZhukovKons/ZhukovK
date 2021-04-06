@@ -16,7 +16,6 @@ import jm.task.core.jdbc.util.Util;
 
 public class UserServiceImpl implements UserService {
 
-    private Connection connection;
     private UserDao daoJDBC = new UserDaoJDBCImpl();
     //private UserDao daoJDBC = new UserDaoHibernateImpl();
 

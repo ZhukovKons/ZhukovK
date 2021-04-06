@@ -1,4 +1,5 @@
 /.idea/
 /target/
-/src/DB/
+/src/resources/DB/
 /src/resources/
+/src/test/java/TestHebirnate.java

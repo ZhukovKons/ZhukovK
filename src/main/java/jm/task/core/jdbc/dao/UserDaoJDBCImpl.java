@@ -1,14 +1,6 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package jm.task.core.jdbc.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +9,7 @@ import jm.task.core.jdbc.util.Util;
 
 public class UserDaoJDBCImpl implements UserDao {
 
-
-    public UserDaoJDBCImpl() {
-    }
+    private Connection connection = Util.getConnection();
 
     public void createUsersTable() {
         runExecute("CREATE TABLE users ( "
@@ -36,7 +26,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void saveUser(String name, String lastName, byte age) {
         String stringSQL = "insert into users (name, lastName, age) values (?,?,?)";
 
-        try (PreparedStatement statement = Util.getConnection().prepareStatement(stringSQL)) {
+        try (PreparedStatement statement = connection.prepareStatement(stringSQL)) {
             statement.setString(1, name);
             statement.setString(2, lastName);
             statement.setByte(3, age);
@@ -44,7 +34,7 @@ public class UserDaoJDBCImpl implements UserDao {
             commit();
             System.out.println(String.format(" User с именем – %s добавлен в базу данных ", name));
         } catch (NullPointerException | SQLException e) {
-            printError("DONT saved");
+            System.out.println("! Пользователь не сохранён");
             rollback();
         }
 
@@ -53,12 +43,12 @@ public class UserDaoJDBCImpl implements UserDao {
     public void removeUserById(long id) {
         String stringSQL = "delete from users where id = ?";
 
-        try (PreparedStatement statement = Util.getConnection().prepareStatement(stringSQL)) {
+        try (PreparedStatement statement = connection.prepareStatement(stringSQL)) {
             statement.setLong(1, id);
             statement.executeUpdate();
             commit();
         } catch (NullPointerException | SQLException e) {
-            printError("DONT remove");
+            System.out.println("! Не удалось удалить пользователя id:" + id);
             rollback();
         }
     }
@@ -66,7 +56,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public List<User> getAllUsers() {
         ArrayList listUsers = new ArrayList();
 
-        try (Statement statement = Util.getConnection().createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery("select * from users");
 
             while (resultSet.next()) {
@@ -75,9 +65,9 @@ public class UserDaoJDBCImpl implements UserDao {
                 listUsers.add(u);
             }
         } catch (SQLException var7) {
-            printError("DONT RRESULT");
+            System.out.println("! Ошибка получения списка пользователей");
         }
-        // if(!listUsers.isEmpty())  listUsers.add(new User());
+        if(listUsers.isEmpty())  listUsers.add(new User());
 
         return listUsers;
     }
@@ -87,33 +77,23 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     private boolean runExecute(String sql) {
-        try (Statement statement = Util.getConnection().createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(sql);
             commit();
             return true;
         } catch (NullPointerException | SQLException e) {
-            printError("RUN: " + Thread.currentThread().getStackTrace()[2].getMethodName() + " ");
+            System.out.println("Ошибка выполнений: " + Thread.currentThread().getStackTrace()[2]);
             rollback();
             return false;
         }
     }
     private void commit() throws SQLException {
-        Util.getConnection().commit();
+        connection.commit();
     }
 
     private void rollback(){
         try {
-            Util.getConnection().rollback();
-        } catch (SQLException throwables) {             //ignore
-        }
-    }
-
-
-    private void printError(String message) {
-        char esc = 27;
-        String error = esc + "[31mERROR: " + esc + "[0m";
-        String m = esc + "[32m" + message + esc + "[0m";
-        String urlError = " | " + esc + "[35m" + Thread.currentThread().getStackTrace()[2] + esc + "[0m";
-        //System.out.println(error + m + urlError);
+            connection.rollback();
+        } catch (SQLException throwables) { }            //ignore
     }
 }
