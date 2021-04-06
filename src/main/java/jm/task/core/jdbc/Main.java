@@ -23,7 +23,7 @@ public class Main {
         }
 
         userService.getAllUsers().forEach(System.out::println);
-        //userService.removeUserById(4);
+        userService.removeUserById(4);
         userService.cleanUsersTable();
         userService.dropUsersTable();
 
