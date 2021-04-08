@@ -16,14 +16,14 @@ public class Main {
     public static void main(String[] args) {
 
         UserService userService = new UserServiceImpl();
-       userService.createUsersTable();
+        userService.createUsersTable();
 
         for (int i = 0; i < 5; ++i) {
             userService.saveUser(runString(), runString(), (byte) ((int) Math.abs(Math.random() * 100.0D)));
         }
 
         userService.getAllUsers().forEach(System.out::println);
-        userService.removeUserById(4);
+        userService.removeUserById(420);
         userService.cleanUsersTable();
         userService.dropUsersTable();
 

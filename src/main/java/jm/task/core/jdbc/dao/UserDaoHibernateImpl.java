@@ -14,66 +14,44 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            if (session.createNativeQuery("create table IF NOT EXISTS users " +
-                    "(id int not null auto_increment, " +
-                    "age int not null, " +
-                    "lastName varchar(50) not null, " +
-                    "name varchar(50) not null, " +
-                    "primary key (id))")
-                    .executeUpdate() > 0) {
-                session.getTransaction().commit();
-            } else {
-                session.getTransaction().rollback();
-            }
-        }catch (NullPointerException n){
-            System.out.println("Не удалось создать БД");
-        }
+        runExecute("create table IF NOT EXISTS users " +
+                "(id int not null auto_increment, " +
+                "age int not null, " +
+                "lastName varchar(50) not null, " +
+                "name varchar(50) not null, " +
+                "primary key (id))", 0);
     }
 
     @Override
     public void dropUsersTable() {
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            if (session.createNativeQuery("DROP TABLE IF EXISTS users").executeUpdate() > 0) {
-                session.getTransaction().commit();
-            } else {
-                session.getTransaction().rollback();
-            }
-        }catch (NullPointerException n){
-            System.out.println("Не удалось удалить БД");
-        }
+        runExecute("DROP TABLE IF EXISTS users", 0);
     }
 
     @Override
-    public void saveUser(String name, String lastName, byte age) {
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            if ((long) session.save(new User(name, lastName, age)) > 0) {
-                session.getTransaction().commit();
-                System.out.println(String.format(" User с именем – %s добавлен в базу данных ", name));
-            } else {
-                session.getTransaction().rollback();
-            }
-        }catch (NullPointerException n){
-            System.out.println("Не удалось сохранить пользователя: " + name);
-        }
+    public void cleanUsersTable() {
+        runExecute("TRUNCATE TABLE users", 0);
     }
 
     @Override
     public void removeUserById(long id) {
-        try (Session session = sessionFactory.openSession()) {
+        if (runExecute("delete from users where id=" + id, id) == 0)
+            System.out.println("Не удалось найти пользователя id: " + id);
+    }
+
+    @Override
+    public void saveUser(String name, String lastName, byte age) {
+        Session session = null;
+        try {
+            session = sessionFactory.openSession();
             session.beginTransaction();
-            session.delete(session.get(User.class, id));
-            if (session.get(User.class, id) == null) {
-                session.getTransaction().commit();
-                session.flush();
-            } else {
-                session.getTransaction().rollback();
-            }
-        } catch (NullPointerException | IllegalArgumentException e) {
-            System.out.println("Dont remove User by Id");
+            session.save(new User(name, lastName, age));
+            session.getTransaction().commit();
+            System.out.println(" User с именем – " + name + " добавлен в базу данных ");
+        } catch (Exception n) {
+            session.getTransaction().rollback();
+            System.out.println("Не удалось сохранить пользователя: " + name);
+        } finally {
+            if (session != null) session.close();
         }
     }
 
@@ -81,23 +59,40 @@ public class UserDaoHibernateImpl implements UserDao {
     public List<User> getAllUsers() {
         try (Session session = sessionFactory.openSession()) {
             return session.createQuery("FROM User", User.class).list();
-        }catch (NullPointerException n){
+        } catch (NullPointerException n) {
             System.out.println("Не удалось сохранить пользователя: ");
-            return new ArrayList<User>(1);
+            return new ArrayList<>(1);
         }
     }
 
-    @Override
-    public void cleanUsersTable() {
-        try (Session session = sessionFactory.openSession()) {
+    private int runExecute(String hql, long id) {
+        Session session = null;
+        int returnResulatat = 0;
+        try {
+            session = sessionFactory.openSession();
             session.beginTransaction();
-            if(session.createSQLQuery("TRUNCATE TABLE users").executeUpdate() > 0) {
-                session.getTransaction().commit();
-            }else{
-                session.getTransaction().rollback();
+            returnResulatat = session.createNativeQuery(hql).executeUpdate();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+            switch (Thread.currentThread().getStackTrace()[2].getMethodName()) {
+                case "removeUserById":
+                    System.out.println("Ошибка удаления пользователя id:" + id);
+                    break;
+                case "createUsersTable":
+                    System.out.println("Не удалось создать БД");
+                    break;
+                case "cleanUsersTable":
+                    System.out.println("Не удалось удалить БД");
+                    break;
+                case "dropUsersTable":
+                    System.out.println("Не удалось очистить таблицу");
+                    break;
+
             }
-        }catch (NullPointerException n){
-            System.out.println("Не удалось очистить таблицу");
+        } finally {
+            if (session != null) session.close();
         }
+        return returnResulatat;
     }
 }

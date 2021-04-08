@@ -44,7 +44,7 @@ public class Util {
         Properties properties = new Properties();
         properties.setProperty(Environment.DIALECT, "org.hibernate.dialect.MySQL5Dialect");
 
-        properties.setProperty(Environment.HBM2DDL_AUTO,"update");
+        properties.setProperty(Environment.HBM2DDL_AUTO, "update");
         properties.setProperty(Environment.DRIVER, "com.mysql.jdbc.Driver");
         properties.setProperty(Environment.USER, LOGIN);
         properties.setProperty(Environment.PASS, PASSWORD);
@@ -58,7 +58,7 @@ public class Util {
         SessionFactory sessionFactory = null;
         try {
             sessionFactory = configuration.buildSessionFactory(serviceRegistryBuilder.build());
-        }catch (IllegalStateException | HibernateException e){
+        } catch (IllegalStateException | HibernateException e) {
             System.out.println("Driver connection error!");
         }
 
