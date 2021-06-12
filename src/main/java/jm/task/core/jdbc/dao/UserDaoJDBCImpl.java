@@ -37,7 +37,6 @@ public class UserDaoJDBCImpl implements UserDao {
             System.out.println("! Пользователь не сохранён");
             rollback();
         }
-
     }
 
     public void removeUserById(long id) {
@@ -67,8 +66,7 @@ public class UserDaoJDBCImpl implements UserDao {
         } catch (SQLException var7) {
             System.out.println("! Ошибка получения списка пользователей");
         }
-        if(listUsers.isEmpty())  listUsers.add(new User());
-
+        if (listUsers.isEmpty()) listUsers.add(new User());
         return listUsers;
     }
 
@@ -87,13 +85,14 @@ public class UserDaoJDBCImpl implements UserDao {
             return false;
         }
     }
+
     private void commit() throws SQLException {
         connection.commit();
     }
 
-    private void rollback(){
+    private void rollback() {
         try {
             connection.rollback();
-        } catch (SQLException throwables) { }            //ignore
+        } catch (SQLException throwables) {}            //ignore
     }
 }

@@ -5,6 +5,7 @@ import javax.persistence.*;
 @Entity
 @Table (name = "users")
 public class User {
+
     @Id
     @GeneratedValue // (strategy = GenerationType.IDENTITY)
     @Column (name = "id")
@@ -18,6 +19,7 @@ public class User {
 
     @Column (name = "age")
     private Byte age;
+
 
     public User() {
     }

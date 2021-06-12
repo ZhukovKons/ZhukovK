@@ -10,6 +10,7 @@ import java.util.List;
 
 
 public class UserDaoHibernateImpl implements UserDao {
+
     private final SessionFactory sessionFactory = Util.getSessionFactory();
 
     @Override
@@ -88,7 +89,6 @@ public class UserDaoHibernateImpl implements UserDao {
                 case "dropUsersTable":
                     System.out.println("Не удалось очистить таблицу");
                     break;
-
             }
         } finally {
             if (session != null) session.close();

@@ -61,7 +61,6 @@ public class Util {
         } catch (IllegalStateException | HibernateException e) {
             System.out.println("Driver connection error!");
         }
-
         return sessionFactory;
     }
 }

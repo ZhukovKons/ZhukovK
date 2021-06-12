@@ -2,7 +2,6 @@ package jm.task.core.jdbc;
 
 import java.util.Random;
 import java.util.stream.Collectors;
-
 import jm.task.core.jdbc.service.UserService;
 import jm.task.core.jdbc.service.UserServiceImpl;
 
